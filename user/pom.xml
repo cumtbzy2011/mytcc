@@ -28,7 +28,11 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <version>1</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jooq</artifactId>
@@ -95,12 +99,12 @@
                                 </schema>
                             </schemata>
                             <!--强制类型-->
-                            <forcedTypes>
-                                <forcedType>
-                                    <name>BOOLEAN</name>
-                                    <types>(?i:TINYINT(\s*\(\d+\))?(\s*UNSIGNED)?)</types>
-                                </forcedType>
-                            </forcedTypes>
+                            <!--<forcedTypes>-->
+                                <!--<forcedType>-->
+                                    <!--<name>BOOLEAN</name>-->
+                                    <!--<types>(?i:TINYINT(\s*\(\d+\))?(\s*UNSIGNED)?)</types>-->
+                                <!--</forcedType>-->
+                            <!--</forcedTypes>-->
                         </database>
                         <generate>
                             <pojos>true</pojos>
