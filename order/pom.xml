@@ -92,7 +92,7 @@
                                     <inputSchema>lost_and_found</inputSchema>
                                 </schema>
                                 <schema>
-                                    <inputSchema>tcc</inputSchema>
+                                    <inputSchema>order</inputSchema>
                                 </schema>
                             </schemata>
                             <!--强制类型-->
@@ -109,7 +109,7 @@
                             <deprecated>true</deprecated>
                         </generate>
                         <target>
-                            <packageName>com.bian.product.order.jooq</packageName>
+                            <packageName>com.bian.order.jooq</packageName>
                             <directory>src/main/java</directory>
                         </target>
                     </generator>

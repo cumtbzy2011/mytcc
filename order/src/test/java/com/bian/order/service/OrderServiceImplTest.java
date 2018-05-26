@@ -1,8 +1,7 @@
-package test.com.bian.product.order.service;
+package com.bian.order.service;
 
-import com.bian.product.order.OrderBootstrap;
-import com.bian.product.order.jooq.tables.pojos.Order;
-import com.bian.product.order.service.OrderServiceImpl;
+import com.bian.order.OrderBootstrap;
+import com.bian.order.jooq.tables.pojos.Order;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.Before;
@@ -41,8 +40,8 @@ public class OrderServiceImplTest {
      * Method: insert(Order order)
      */
     @Test
-    @Rollback
-    @Transactional
+//    @Rollback
+//    @Transactional
     public void testInsert() throws Exception {
         Order order = new Order();
         Integer insert = orderService.insert(order);
