@@ -24,6 +24,7 @@ import org.jooq.TableField;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.TableImpl;
+import org.jooq.types.UByte;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
 
@@ -41,7 +42,7 @@ import org.jooq.types.ULong;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Order extends TableImpl<OrderRecord> {
 
-    private static final long serialVersionUID = 818828342;
+    private static final long serialVersionUID = 1792282454;
 
     /**
      * The reference instance of <code>order.order</code>
@@ -94,7 +95,7 @@ public class Order extends TableImpl<OrderRecord> {
     /**
      * The column <code>order.order.status</code>. 订单状态, 0为支付中, 1为交易完成, 2为全部资源已被撤销, 3为资源确认冲突
      */
-    public final TableField<OrderRecord, Boolean> STATUS = createField("status", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaultValue(org.jooq.impl.DSL.inline("0", org.jooq.impl.SQLDataType.BOOLEAN)), this, "订单状态, 0为支付中, 1为交易完成, 2为全部资源已被撤销, 3为资源确认冲突");
+    public final TableField<OrderRecord, UByte> STATUS = createField("status", org.jooq.impl.SQLDataType.TINYINTUNSIGNED.nullable(false).defaultValue(org.jooq.impl.DSL.inline("0", org.jooq.impl.SQLDataType.TINYINTUNSIGNED)), this, "订单状态, 0为支付中, 1为交易完成, 2为全部资源已被撤销, 3为资源确认冲突");
 
     /**
      * Create a <code>order.order</code> table reference

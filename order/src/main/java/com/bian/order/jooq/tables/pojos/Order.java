@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 
 import javax.annotation.Generated;
 
+import org.jooq.types.UByte;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
 
@@ -26,7 +27,7 @@ import org.jooq.types.ULong;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Order implements Serializable {
 
-    private static final long serialVersionUID = 184905673;
+    private static final long serialVersionUID = 1563714008;
 
     private ULong     id;
     private Timestamp createTime;
@@ -35,7 +36,7 @@ public class Order implements Serializable {
     private ULong     userId;
     private ULong     productId;
     private UInteger  price;
-    private Boolean   status;
+    private UByte     status;
 
     public Order() {}
 
@@ -58,7 +59,7 @@ public class Order implements Serializable {
         ULong     userId,
         ULong     productId,
         UInteger  price,
-        Boolean   status
+        UByte     status
     ) {
         this.id = id;
         this.createTime = createTime;
@@ -126,11 +127,11 @@ public class Order implements Serializable {
         this.price = price;
     }
 
-    public Boolean getStatus() {
+    public UByte getStatus() {
         return this.status;
     }
 
-    public void setStatus(Boolean status) {
+    public void setStatus(UByte status) {
         this.status = status;
     }
 

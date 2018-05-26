@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 
 import javax.annotation.Generated;
 
+import org.jooq.types.UByte;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
 
@@ -26,7 +27,7 @@ import org.jooq.types.ULong;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Productstocktcc implements Serializable {
 
-    private static final long serialVersionUID = 1770678337;
+    private static final long serialVersionUID = -617472090;
 
     private ULong     id;
     private Timestamp createTime;
@@ -34,7 +35,7 @@ public class Productstocktcc implements Serializable {
     private Timestamp deleteTime;
     private Timestamp expireTime;
     private UInteger  stock;
-    private Boolean   status;
+    private UByte     status;
     private ULong     tProductId;
 
     public Productstocktcc() {}
@@ -57,7 +58,7 @@ public class Productstocktcc implements Serializable {
         Timestamp deleteTime,
         Timestamp expireTime,
         UInteger  stock,
-        Boolean   status,
+        UByte     status,
         ULong     tProductId
     ) {
         this.id = id;
@@ -118,11 +119,11 @@ public class Productstocktcc implements Serializable {
         this.stock = stock;
     }
 
-    public Boolean getStatus() {
+    public UByte getStatus() {
         return this.status;
     }
 
-    public void setStatus(Boolean status) {
+    public void setStatus(UByte status) {
         this.status = status;
     }
 

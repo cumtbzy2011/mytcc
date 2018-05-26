@@ -25,6 +25,7 @@ import org.jooq.TableField;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.TableImpl;
+import org.jooq.types.UByte;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
 
@@ -42,7 +43,7 @@ import org.jooq.types.ULong;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Productstocktcc extends TableImpl<ProductstocktccRecord> {
 
-    private static final long serialVersionUID = 895956674;
+    private static final long serialVersionUID = 2034786318;
 
     /**
      * The reference instance of <code>product.productstocktcc</code>
@@ -90,7 +91,7 @@ public class Productstocktcc extends TableImpl<ProductstocktccRecord> {
     /**
      * The column <code>product.productstocktcc.status</code>. 0为try, 1为confirm完成
      */
-    public final TableField<ProductstocktccRecord, Boolean> STATUS = createField("status", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "0为try, 1为confirm完成");
+    public final TableField<ProductstocktccRecord, UByte> STATUS = createField("status", org.jooq.impl.SQLDataType.TINYINTUNSIGNED.nullable(false), this, "0为try, 1为confirm完成");
 
     /**
      * The column <code>product.productstocktcc.t_product_id</code>.

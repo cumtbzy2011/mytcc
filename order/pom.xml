@@ -96,12 +96,12 @@
                                 </schema>
                             </schemata>
                             <!--强制类型-->
-                            <forcedTypes>
-                                <forcedType>
-                                    <name>BOOLEAN</name>
-                                    <types>(?i:TINYINT(\s*\(\d+\))?(\s*UNSIGNED)?)</types>
-                                </forcedType>
-                            </forcedTypes>
+                            <!--<forcedTypes>-->
+                                <!--<forcedType>-->
+                                    <!--<name>BOOLEAN</name>-->
+                                    <!--<types>(?i:TINYINT(\s*\(\d+\))?(\s*UNSIGNED)?)</types>-->
+                                <!--</forcedType>-->
+                            <!--</forcedTypes>-->
                         </database>
                         <generate>
                             <pojos>true</pojos>
