@@ -1,13 +1,14 @@
 package test.com.bian.order.service;
 
 import com.bian.order.OrderBootstrap;
+import com.bian.order.feign.ProductClient;
 import com.bian.order.jooq.tables.pojos.Conflict;
-import com.bian.order.service.ConflictService;
+import com.bian.order.model.response.ObjectDataResponse;
 import com.bian.order.service.ConflictServiceImpl;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.Before;
 import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,6 +26,17 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class ConflictServiceImplTest {
     @Autowired
     ConflictServiceImpl conflictService;
+    @Autowired
+    ProductClient productClient;
+
+    @Test
+    public void testClient() {
+        ObjectDataResponse<String> result = productClient.test(101L);
+
+        Assert.assertNotNull(result);
+
+        System.out.println(result.getData());
+    }
 
     @Before
     public void before() throws Exception {
