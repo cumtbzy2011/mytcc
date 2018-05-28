@@ -33,6 +33,7 @@ public class CoordinateControllerServiceImpl implements CoordinateControllerServ
     }
 
 
+    @Override
     public void confirm(TccRequest request) {
         List<Participant> participantLinks = request.getParticipantLinks();
 
@@ -56,6 +57,7 @@ public class CoordinateControllerServiceImpl implements CoordinateControllerServ
         }
     }
 
+    @Override
     public void cancel(TccRequest request) {
         final List<Participant> participantList = Preconditions.checkNotNull(request.getParticipantLinks());
         try {

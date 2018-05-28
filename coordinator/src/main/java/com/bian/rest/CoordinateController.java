@@ -19,11 +19,11 @@ public class CoordinateController {
 
     @PutMapping("/coordinator/confirmation")
     public void confirm(@RequestBody TccRequest request) {
-
+        service.confirm(request);
     }
 
     @PutMapping("/coordinator/cancellation")
     public void cancel(@RequestBody TccRequest request) {
-
+        service.cancel(request);
     }
 }
