@@ -1,4 +1,4 @@
-package com.bian.common.model;
+package com.bian.common.model.response;
 
 import java.io.Serializable;
 

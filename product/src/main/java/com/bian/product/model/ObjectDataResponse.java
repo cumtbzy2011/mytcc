@@ -1,6 +1,6 @@
 package com.bian.product.model;
 
-import com.bian.common.model.RestfulResponse;
+import com.bian.common.model.response.RestfulResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,4 +1,4 @@
-package test.com.bian.order.service;
+package com.bian.order.service;
 
 import com.bian.order.OrderBootstrap;
 import com.bian.order.feign.ProductClient;

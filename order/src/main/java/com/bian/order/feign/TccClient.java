@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 @FeignClient(name = "tcc", fallback = TccClientFallback.class)
 public interface TccClient {
-    String API_PATH = "/api/v1/coordinator";
+    String API_PATH = "/rpc";
 
     @RequestMapping(value = API_PATH + "/confirmation", method = RequestMethod.PUT, produces = {MediaType.APPLICATION_JSON_UTF8_VALUE}, consumes = {MediaType.APPLICATION_JSON_UTF8_VALUE})
     void confirm(@RequestBody TccRequest request);
