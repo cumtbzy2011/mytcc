@@ -18,13 +18,13 @@ public class UserBalanceReservationController {
     @Autowired
     private UserbalancetccService tccService;
 
-    @RequestMapping(value = "/balances/reservation", method = RequestMethod.POST)
-    public BalanceReservationResponse reserve(@RequestBody BalanceReservationRequest request) {
+    @GetMapping(value = "/balances/reservation")
+    public Participant reserve(@RequestBody BalanceReservationRequest request) {
         Userbalancetcc userbalancetcc = tccService.trying(request.getUserId(), request.getAmount());
         Participant participant = new Participant();
         participant.setUri("http://"+applicationName+"/rpc/balances/reservation/"+userbalancetcc.getId());
         participant.setExpireTime(userbalancetcc.getExpireTime().toLocalDateTime());
-        return new BalanceReservationResponse(participant);
+        return participant;
     }
 
     @PutMapping("/balances/reservation/{reservationId}")

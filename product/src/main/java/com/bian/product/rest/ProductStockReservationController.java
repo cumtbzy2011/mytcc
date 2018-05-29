@@ -20,13 +20,13 @@ public class ProductStockReservationController {
     ProductstocktccService productstocktccService;
 
     //预留库存try
-    @RequestMapping(name = "/stocks/reservation", method = RequestMethod.POST)
-    public StockReservationResponse reserve(@RequestBody StockReservationRequest reservationRequest) {
-        Productstocktcc tcc = productstocktccService.trying(reservationRequest.getProductId());
+    @RequestMapping(name = "/stocks/reservation", method = RequestMethod.GET)
+    public Participant reserve(Long productId) {
+        Productstocktcc tcc = productstocktccService.trying(productId);
         Participant participant = new Participant();
         participant.setExpireTime(tcc.getExpireTime().toLocalDateTime());
         participant.setUri("http://" + applicationName + "/rpc/stocks/reservation/" + tcc.getId());
-        return new StockReservationResponse(participant);
+        return participant;
     }
 
 

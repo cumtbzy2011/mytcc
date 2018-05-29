@@ -8,7 +8,6 @@ import com.bian.user.jooq.tables.pojos.User;
 import com.bian.user.jooq.tables.pojos.Userbalancetcc;
 import com.bian.user.jooq.tables.records.UserbalancetccRecord;
 import org.jooq.DSLContext;
-import org.jooq.Result;
 import org.jooq.types.ULong;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,8 +17,8 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.bian.user.jooq.tables.Userbalancetcc.USERBALANCETCC;
 import static com.bian.user.jooq.tables.User.USER_;
+import static com.bian.user.jooq.tables.Userbalancetcc.USERBALANCETCC;
 
 @Service
 public class UserbalancetccServiceImpl implements UserbalancetccService {
