@@ -25,44 +25,36 @@ import org.jooq.types.ULong;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Participant implements Serializable {
 
-    private static final long serialVersionUID = 163084896;
+    private static final long serialVersionUID = -1106207741;
 
     private ULong     id;
     private Timestamp createTime;
-    private Timestamp updateTime;
-    private Timestamp deleteTime;
-    private Timestamp expireTime;
-    private String    uri;
     private ULong     tOrderId;
+    private String    partId;
+    private String    partType;
 
     public Participant() {}
 
     public Participant(Participant value) {
         this.id = value.id;
         this.createTime = value.createTime;
-        this.updateTime = value.updateTime;
-        this.deleteTime = value.deleteTime;
-        this.expireTime = value.expireTime;
-        this.uri = value.uri;
         this.tOrderId = value.tOrderId;
+        this.partId = value.partId;
+        this.partType = value.partType;
     }
 
     public Participant(
         ULong     id,
         Timestamp createTime,
-        Timestamp updateTime,
-        Timestamp deleteTime,
-        Timestamp expireTime,
-        String    uri,
-        ULong     tOrderId
+        ULong     tOrderId,
+        String    partId,
+        String    partType
     ) {
         this.id = id;
         this.createTime = createTime;
-        this.updateTime = updateTime;
-        this.deleteTime = deleteTime;
-        this.expireTime = expireTime;
-        this.uri = uri;
         this.tOrderId = tOrderId;
+        this.partId = partId;
+        this.partType = partType;
     }
 
     public ULong getId() {
@@ -81,38 +73,6 @@ public class Participant implements Serializable {
         this.createTime = createTime;
     }
 
-    public Timestamp getUpdateTime() {
-        return this.updateTime;
-    }
-
-    public void setUpdateTime(Timestamp updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public Timestamp getDeleteTime() {
-        return this.deleteTime;
-    }
-
-    public void setDeleteTime(Timestamp deleteTime) {
-        this.deleteTime = deleteTime;
-    }
-
-    public Timestamp getExpireTime() {
-        return this.expireTime;
-    }
-
-    public void setExpireTime(Timestamp expireTime) {
-        this.expireTime = expireTime;
-    }
-
-    public String getUri() {
-        return this.uri;
-    }
-
-    public void setUri(String uri) {
-        this.uri = uri;
-    }
-
     public ULong getTOrderId() {
         return this.tOrderId;
     }
@@ -121,17 +81,31 @@ public class Participant implements Serializable {
         this.tOrderId = tOrderId;
     }
 
+    public String getPartId() {
+        return this.partId;
+    }
+
+    public void setPartId(String partId) {
+        this.partId = partId;
+    }
+
+    public String getPartType() {
+        return this.partType;
+    }
+
+    public void setPartType(String partType) {
+        this.partType = partType;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Participant (");
 
         sb.append(id);
         sb.append(", ").append(createTime);
-        sb.append(", ").append(updateTime);
-        sb.append(", ").append(deleteTime);
-        sb.append(", ").append(expireTime);
-        sb.append(", ").append(uri);
         sb.append(", ").append(tOrderId);
+        sb.append(", ").append(partId);
+        sb.append(", ").append(partType);
 
         sb.append(")");
         return sb.toString();

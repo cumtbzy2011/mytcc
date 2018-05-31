@@ -11,6 +11,7 @@ import org.jooq.types.UByte;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -83,7 +84,7 @@ public class ProductstocktccServiceImpl implements ProductstocktccService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void confirmReservation(Long id) {
+    public int confirmReservation(Long id) {
         Productstocktcc tcc = selectTccById(id);
         if (tcc == null) {
             throw new ReservationExpireException("resource " + id + " has been cancelled or does not exist at all");
@@ -95,6 +96,8 @@ public class ProductstocktccServiceImpl implements ProductstocktccService {
                 throw new ReservationExpireException("resource " + id + " has been cancelled");
             }
         }
+
+        return 1;
     }
 
     private Productstocktcc selectTccById(Long id) {
@@ -105,6 +108,7 @@ public class ProductstocktccServiceImpl implements ProductstocktccService {
         return productstocktccs.size() > 0 ? productstocktccs.get(0) : null;
     }
 
+    @Scheduled
     private int updateToConfirmationById(ULong id) {
         return create.update(PRODUCTSTOCKTCC)
           .set(PRODUCTSTOCKTCC.STATUS, UByte.valueOf(TccStatus.CONFIRM))

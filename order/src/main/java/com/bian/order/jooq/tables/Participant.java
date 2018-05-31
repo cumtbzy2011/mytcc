@@ -41,7 +41,7 @@ import org.jooq.types.ULong;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Participant extends TableImpl<ParticipantRecord> {
 
-    private static final long serialVersionUID = -2041834656;
+    private static final long serialVersionUID = -950389395;
 
     /**
      * The reference instance of <code>order.participant</code>
@@ -67,29 +67,19 @@ public class Participant extends TableImpl<ParticipantRecord> {
     public final TableField<ParticipantRecord, Timestamp> CREATE_TIME = createField("create_time", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false).defaultValue(org.jooq.impl.DSL.field("CURRENT_TIMESTAMP", org.jooq.impl.SQLDataType.TIMESTAMP)), this, "");
 
     /**
-     * The column <code>order.participant.update_time</code>.
-     */
-    public final TableField<ParticipantRecord, Timestamp> UPDATE_TIME = createField("update_time", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false).defaultValue(org.jooq.impl.DSL.field("CURRENT_TIMESTAMP", org.jooq.impl.SQLDataType.TIMESTAMP)), this, "");
-
-    /**
-     * The column <code>order.participant.delete_time</code>.
-     */
-    public final TableField<ParticipantRecord, Timestamp> DELETE_TIME = createField("delete_time", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false).defaultValue(org.jooq.impl.DSL.inline("1970-01-01 00:00:00", org.jooq.impl.SQLDataType.TIMESTAMP)), this, "");
-
-    /**
-     * The column <code>order.participant.expire_time</code>. 预留资源过期时间
-     */
-    public final TableField<ParticipantRecord, Timestamp> EXPIRE_TIME = createField("expire_time", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "预留资源过期时间");
-
-    /**
-     * The column <code>order.participant.uri</code>. 预留资源确认URI
-     */
-    public final TableField<ParticipantRecord, String> URI = createField("uri", org.jooq.impl.SQLDataType.VARCHAR(255).nullable(false), this, "预留资源确认URI");
-
-    /**
      * The column <code>order.participant.t_order_id</code>. 订单ID
      */
     public final TableField<ParticipantRecord, ULong> T_ORDER_ID = createField("t_order_id", org.jooq.impl.SQLDataType.BIGINTUNSIGNED.nullable(false), this, "订单ID");
+
+    /**
+     * The column <code>order.participant.part_id</code>.
+     */
+    public final TableField<ParticipantRecord, String> PART_ID = createField("part_id", org.jooq.impl.SQLDataType.VARCHAR(45).nullable(false), this, "");
+
+    /**
+     * The column <code>order.participant.part_type</code>.
+     */
+    public final TableField<ParticipantRecord, String> PART_TYPE = createField("part_type", org.jooq.impl.SQLDataType.VARCHAR(45).nullable(false), this, "");
 
     /**
      * Create a <code>order.participant</code> table reference

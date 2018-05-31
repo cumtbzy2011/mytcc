@@ -8,6 +8,9 @@ spring:
     url: jdbc:mysql://106.15.226.228:3306/product?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: root
     password: 123456
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
 eureka:
   client:
     registerWithEureka: true

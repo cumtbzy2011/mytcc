@@ -10,7 +10,7 @@ public interface ProductstocktccService {
     Productstocktcc trying(long productId);
 
     @Transactional(rollbackFor = Exception.class)
-    void confirmReservation(Long id);
+    int confirmReservation(Long id);
 
     @Transactional(rollbackFor = Exception.class)
     abstract void cancelReservation(Long id);

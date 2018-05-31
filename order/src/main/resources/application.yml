@@ -19,3 +19,13 @@ eureka:
     healthCheckUrlPath: /actuator/health
     prefer-ip-address: false
 
+ribbon:
+  ConnectTimeout: 5000
+  ReadTimeout: 5000
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 6000

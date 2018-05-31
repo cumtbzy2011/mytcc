@@ -8,7 +8,7 @@ public interface UserbalancetccService {
     Userbalancetcc trying(Long userId, long amount);
 
     @Transactional
-    void confirmReservation(Long id);
+    int confirmReservation(Long id);
 
     @Transactional
     void cancelReservation(Long id);

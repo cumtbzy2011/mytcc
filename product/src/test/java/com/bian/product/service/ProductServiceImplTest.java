@@ -14,7 +14,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.List;
 
 /**
- * ProductServiceImpl Tester.
+ * ProductService Tester.
  *
  * @author <Authors name>
  * @version 1.0
@@ -24,7 +24,7 @@ import java.util.List;
 @SpringBootTest(classes = ProductBootstrap.class)
 public class ProductServiceImplTest {
     @Autowired
-    ProductServiceImpl productService;
+    ProductService productService;
 
     @Before
     public void before() throws Exception {

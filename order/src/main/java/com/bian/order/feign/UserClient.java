@@ -1,9 +1,11 @@
 package com.bian.order.feign;
 
 import com.bian.common.model.vo.Participant;
-import com.bian.order.model.vo.User;
+import com.bian.common.model.vo.VoUser;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @FeignClient(name = "user", fallback = UserClientFallback.class)
 public interface UserClient {
@@ -11,8 +13,11 @@ public interface UserClient {
     String API_PATH = "rpc";
 
     @RequestMapping(value = API_PATH + "/user/{userId}", method = RequestMethod.GET)
-    User findUser(@PathVariable("userId") Long userId);
+    VoUser findUser(@PathVariable("userId") Long userId);
 
     @GetMapping(value = API_PATH + "/balances/reservation")
-    Participant reserve(@RequestParam Long userId, @RequestParam Long amount);
+    Long reserve(@RequestParam("userId") Long userId, @RequestParam("amount") Long amount);
+
+    @GetMapping(value = API_PATH + "/balances/confrm")
+    int confirm(@RequestParam("partId") Long partId);
 }

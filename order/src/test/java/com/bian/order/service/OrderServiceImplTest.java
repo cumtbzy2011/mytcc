@@ -26,7 +26,7 @@ import java.util.List;
 @SpringBootTest(classes = OrderBootstrap.class)
 public class OrderServiceImplTest {
     @Autowired
-    OrderServiceImpl orderService;
+    OrderService orderService;
 
     @Before
     public void before() throws Exception {

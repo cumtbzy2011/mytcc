@@ -1,11 +1,11 @@
 package com.bian.order.model.request;
 
-import com.bian.order.model.vo.OrderParticipant;
+import com.bian.common.model.vo.VoParticipant;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
 public class TccRequest {
-    List<OrderParticipant> participantLinks;
+    List<VoParticipant> participantLinks;
 }

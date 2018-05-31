@@ -10,4 +10,5 @@ public class ProductBootstrap {
     public static void main(String[] args) {
         SpringApplication.run(ProductBootstrap.class, args);
     }
+
 }

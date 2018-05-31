@@ -85,7 +85,7 @@ public class UserbalancetccServiceImpl implements UserbalancetccService {
 
     @Override
     @Transactional
-    public void confirmReservation(Long id) {
+    public int confirmReservation(Long id) {
         Userbalancetcc userbalancetcc = selectTccById(id);
         if (userbalancetcc == null) {
             throw new ReservationExpireException("resource " + id + " has been cancelled or does not exist at all");
@@ -96,6 +96,8 @@ public class UserbalancetccServiceImpl implements UserbalancetccService {
                 throw new ReservationExpireException("resource " + id + " has been cancelled");
             }
         }
+
+        return 1;
     }
 
     private Userbalancetcc selectTccById(Long id) {
