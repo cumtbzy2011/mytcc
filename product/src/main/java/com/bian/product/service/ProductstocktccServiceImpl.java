@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import static com.bian.product.jooq.tables.Product.PRODUCT_;
 import static com.bian.product.jooq.tables.Productstocktcc.PRODUCTSTOCKTCC;
@@ -137,6 +138,29 @@ public class ProductstocktccServiceImpl implements ProductstocktccService {
         return 1;
     }
 
+    //回收过期资源，为了避免和order请求冲突，只能回退TRYING的资源
+    @Transactional
+    public int cancelExpire(Productstocktcc tcc) {
+        int result = deleteExpireTccById(tcc.getId());
+        if (result == 1) {
+            int returnReservedStock = returnReservedStock(tcc.getTProductId());
+            if (returnReservedStock == 0) {
+                //回退本次事务
+                throw new IllegalStateException("product stock reservation id " + tcc.getId() + " was succeeded in deleting, but failed to make compensation for product id " + tcc.getTProductId());
+            }
+        }
+        return 1;
+    }
+
+    private int deleteExpireTccById(ULong id) {
+        return create.update(PRODUCTSTOCKTCC)
+          .set(PRODUCTSTOCKTCC.STATUS, UByte.valueOf(TccStatus.CANCEL))
+          .where(PRODUCTSTOCKTCC.ID.eq(id))
+          .and(PRODUCTSTOCKTCC.STATUS.eq(UByte.valueOf(TccStatus.TRYING)))
+          .execute();
+    }
+
+
     private int deleteTccById(ULong id) {
         return create.update(PRODUCTSTOCKTCC)
           .set(PRODUCTSTOCKTCC.STATUS, UByte.valueOf(TccStatus.CANCEL))
@@ -151,4 +175,5 @@ public class ProductstocktccServiceImpl implements ProductstocktccService {
           .where(PRODUCT_.ID.eq(id))
           .execute();
     }
+
 }

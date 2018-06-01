@@ -124,7 +124,7 @@ public class UserbalancetccServiceImpl implements UserbalancetccService {
             throw new RuntimeException("resource " + id + " has been cancelled or does not exist at all");
         }
 
-        if (userbalancetcc.getStatus().intValue() != TccStatus.TRYING) {
+        if (userbalancetcc.getStatus().intValue() != TccStatus.CANCEL) {
             int deleteResult = deleteTryingById(userbalancetcc.getId());
             if (deleteResult == 1) {
                 int i = returnBalance(userbalancetcc.getTUserId(), userbalancetcc.getAmount());
@@ -135,6 +135,26 @@ public class UserbalancetccServiceImpl implements UserbalancetccService {
         }
 
         return 1;
+    }
+
+    @Transactional
+    public int cancelExpire(Userbalancetcc tcc) {
+        int result = deleteTryingById(tcc.getId());
+        if (result == 1) {
+            int i = returnBalance(tcc.getTUserId(), tcc.getAmount());
+            if (i == 0) {
+                throw new IllegalStateException("回退余额失败");
+            }
+        }
+        return 1;
+    }
+
+    private int deleteExpireById(ULong id) {
+        return create.update(USERBALANCETCC)
+          .set(USERBALANCETCC.STATUS, (byte) TccStatus.CANCEL)
+          .where(USERBALANCETCC.ID.eq(id))
+          .and(USERBALANCETCC.STATUS.eq((byte) TccStatus.TRYING))
+          .execute();
     }
 
 
@@ -149,7 +169,7 @@ public class UserbalancetccServiceImpl implements UserbalancetccService {
         return create.update(USERBALANCETCC)
           .set(USERBALANCETCC.STATUS, (byte) TccStatus.CANCEL)
           .where(USERBALANCETCC.ID.eq(id))
-          .and(USERBALANCETCC.STATUS.ne((byte) TccStatus.TRYING))
+          .and(USERBALANCETCC.STATUS.ne((byte) TccStatus.CANCEL))
           .execute();
     }
 }
