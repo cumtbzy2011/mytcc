@@ -139,7 +139,7 @@ public class UserbalancetccServiceImpl implements UserbalancetccService {
 
     @Transactional
     public int cancelExpire(Userbalancetcc tcc) {
-        int result = deleteTryingById(tcc.getId());
+        int result = deleteExpireById(tcc.getId());
         if (result == 1) {
             int i = returnBalance(tcc.getTUserId(), tcc.getAmount());
             if (i == 0) {
