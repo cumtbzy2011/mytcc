@@ -1,12 +1,9 @@
 package com.bian.user.service;
 
-import com.bian.common.Shift;
-import com.bian.common.StatusCode;
-import com.bian.common.exception.ReservationExpireException;
-import com.bian.common.model.TccStatus;
 import com.bian.user.jooq.tables.pojos.User;
 import com.bian.user.jooq.tables.pojos.Userbalancetcc;
 import com.bian.user.jooq.tables.records.UserbalancetccRecord;
+import com.bian.user.model.TccStatus;
 import org.jooq.DSLContext;
 import org.jooq.types.ULong;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +25,7 @@ public class UserbalancetccServiceImpl implements UserbalancetccService {
     public int insert(Userbalancetcc userbalancetcc) {
         UserbalancetccRecord result = create.insertInto(USERBALANCETCC)
           .set(USERBALANCETCC.AMOUNT, userbalancetcc.getAmount())
-//          .set(USERBALANCETCC.STATUS, (byte) TccStatus.TRY)
           .set(USERBALANCETCC.T_USER_ID, userbalancetcc.getTUserId())
-//          .set(USERBALANCETCC.CREATE_TIME, Timestamp.valueOf(LocalDateTime.now()))
           .set(USERBALANCETCC.EXPIRE_TIME, userbalancetcc.getExpireTime())
           .returning(USERBALANCETCC.ID)
           .fetchOne();
@@ -43,7 +38,7 @@ public class UserbalancetccServiceImpl implements UserbalancetccService {
     public Userbalancetcc trying(Long userId, long amount) {
         User user = selectUserById(userId);
         if (user == null) {
-            Shift.fatal(StatusCode.USER_NOT_EXISTS);
+            throw new RuntimeException("用户不存在");
         }
 
         return trying(user, amount, 15);
@@ -53,11 +48,11 @@ public class UserbalancetccServiceImpl implements UserbalancetccService {
     public Userbalancetcc trying(User user, long amount, long expireSeconds) {
         int isLock = consumeBalance(user.getId(), amount);
         if (isLock == 0) {
-            Shift.fatal(StatusCode.INSUFFICIENT_BALANCE);
+            throw new RuntimeException("预留余额失败");
         }
         Userbalancetcc userbalancetcc = new Userbalancetcc();
         userbalancetcc.setAmount(amount);
-        userbalancetcc.setStatus((byte) TccStatus.TRY);
+        userbalancetcc.setStatus((byte) TccStatus.TRYING);
         userbalancetcc.setTUserId(user.getId());
         userbalancetcc.setExpireTime(Timestamp.valueOf(LocalDateTime.now().plusSeconds(expireSeconds)));
         this.insert(userbalancetcc);
@@ -88,13 +83,15 @@ public class UserbalancetccServiceImpl implements UserbalancetccService {
     public int confirmReservation(Long id) {
         Userbalancetcc userbalancetcc = selectTccById(id);
         if (userbalancetcc == null) {
-            throw new ReservationExpireException("resource " + id + " has been cancelled or does not exist at all");
+            throw new RuntimeException("resource " + id + " has been cancelled or does not exist at all");
         }
-        if (TccStatus.TRY == userbalancetcc.getStatus().intValue()) {
+        if (TccStatus.TRYING == userbalancetcc.getStatus().intValue()) {
             int isSuccessful = updateToConfirmationById(userbalancetcc.getId());
             if (isSuccessful == 0) {
-                throw new ReservationExpireException("resource " + id + " has been cancelled");
+                throw new RuntimeException("resource " + id + " has been cancelled");
             }
+        } else if (TccStatus.CANCEL == userbalancetcc.getStatus().intValue()) {
+            throw new RuntimeException("resource " + id + " has been cancelled");
         }
 
         return 1;
@@ -113,31 +110,46 @@ public class UserbalancetccServiceImpl implements UserbalancetccService {
         return create.update(USERBALANCETCC)
           .set(USERBALANCETCC.STATUS, (byte) TccStatus.CONFIRM)
           .where(USERBALANCETCC.ID.eq(id))
-          .and(USERBALANCETCC.STATUS.eq((byte) TccStatus.TRY))
+          .and(USERBALANCETCC.STATUS.eq((byte) TccStatus.TRYING)
+            .or(USERBALANCETCC.STATUS.eq((byte) TccStatus.CONFIRM)))
           .execute();
     }
 
 
     @Override
     @Transactional
-    public void cancelReservation(Long id) {
+    public int cancelReservation(Long id) {
         Userbalancetcc userbalancetcc = selectTccById(id);
         if (userbalancetcc == null) {
-            throw new ReservationExpireException("resource " + id + " has been cancelled or does not exist at all");
+            throw new RuntimeException("resource " + id + " has been cancelled or does not exist at all");
         }
 
-        if (userbalancetcc.getStatus().intValue() == TccStatus.TRY) {
+        if (userbalancetcc.getStatus().intValue() != TccStatus.TRYING) {
             int deleteResult = deleteTryingById(userbalancetcc.getId());
-            if (deleteResult == 0) {
-                throw new ReservationExpireException("resource " + id + " has been cancelled");
+            if (deleteResult == 1) {
+                int i = returnBalance(userbalancetcc.getTUserId(), userbalancetcc.getAmount());
+                if (i == 0) {
+                    throw new IllegalStateException("回退余额失败");
+                }
             }
         }
+
+        return 1;
+    }
+
+
+    private int returnBalance(ULong id, Long amount) {
+        return create.update(USER_)
+          .set(USER_.BALANCE, USER_.BALANCE.add(amount))
+          .where(USER_.ID.eq(id))
+          .execute();
     }
 
     private int deleteTryingById(ULong id) {
-        return create.delete(USERBALANCETCC)
+        return create.update(USERBALANCETCC)
+          .set(USERBALANCETCC.STATUS, (byte) TccStatus.CANCEL)
           .where(USERBALANCETCC.ID.eq(id))
-          .and(USERBALANCETCC.STATUS.eq((byte) TccStatus.TRY))
+          .and(USERBALANCETCC.STATUS.ne((byte) TccStatus.TRYING))
           .execute();
     }
 }

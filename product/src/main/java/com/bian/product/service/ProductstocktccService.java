@@ -13,5 +13,5 @@ public interface ProductstocktccService {
     int confirmReservation(Long id);
 
     @Transactional(rollbackFor = Exception.class)
-    abstract void cancelReservation(Long id);
+    int cancelReservation(Long id);
 }

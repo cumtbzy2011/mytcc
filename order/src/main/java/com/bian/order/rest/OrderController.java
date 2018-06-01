@@ -44,7 +44,7 @@ public class OrderController {
 
     @Data
     class PlaceOrderRequest {
-       @NotNull Long userId;
-       @NotNull Long productId;
+        @NotNull Long userId;
+        @NotNull Long productId;
     }
 }

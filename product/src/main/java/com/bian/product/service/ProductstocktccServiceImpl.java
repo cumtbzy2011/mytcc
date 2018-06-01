@@ -1,11 +1,8 @@
 package com.bian.product.service;
 
-import com.bian.common.Shift;
-import com.bian.common.StatusCode;
-import com.bian.common.exception.ReservationExpireException;
 import com.bian.product.jooq.tables.pojos.Product;
 import com.bian.product.jooq.tables.pojos.Productstocktcc;
-import com.bian.common.model.TccStatus;
+import com.bian.product.model.TccStatus;
 import org.jooq.DSLContext;
 import org.jooq.types.UByte;
 import org.jooq.types.UInteger;
@@ -19,8 +16,8 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.bian.product.jooq.tables.Productstocktcc.PRODUCTSTOCKTCC;
 import static com.bian.product.jooq.tables.Product.PRODUCT_;
+import static com.bian.product.jooq.tables.Productstocktcc.PRODUCTSTOCKTCC;
 
 @Service
 public class ProductstocktccServiceImpl implements ProductstocktccService {
@@ -44,7 +41,7 @@ public class ProductstocktccServiceImpl implements ProductstocktccService {
     public Productstocktcc trying(long productId) {
         Product product = selectProductById(productId);
         if (product == null) {
-            Shift.fatal(StatusCode.PRODUCT_NOT_EXISTS);
+            throw new RuntimeException("需要预留的商品不存在");
         }
         return trying(product, 15);
     }
@@ -53,11 +50,11 @@ public class ProductstocktccServiceImpl implements ProductstocktccService {
     public Productstocktcc trying(Product product, long expireSeconds) {
         int isLock = this.consumeStock(product.getId());
         if (isLock == 0) {
-            Shift.fatal(StatusCode.INSUFFICIENT_PRODUCT);
+            throw new RuntimeException("预留失败");
         }
         Productstocktcc tcc = new Productstocktcc();
         tcc.setStock(UInteger.valueOf(1));
-        tcc.setStatus(UByte.valueOf(TccStatus.TRY));
+        tcc.setStatus(UByte.valueOf(TccStatus.TRYING));
         tcc.setTProductId(product.getId());
         tcc.setExpireTime(Timestamp.valueOf(LocalDateTime.now().plusSeconds(expireSeconds)));
 
@@ -87,17 +84,18 @@ public class ProductstocktccServiceImpl implements ProductstocktccService {
     public int confirmReservation(Long id) {
         Productstocktcc tcc = selectTccById(id);
         if (tcc == null) {
-            throw new ReservationExpireException("resource " + id + " has been cancelled or does not exist at all");
+            throw new RuntimeException("resource " + id + " has been cancelled or does not exist at all");
         }
-
-        if (TccStatus.TRY == tcc.getStatus().intValue()) {
+        if (TccStatus.TRYING == tcc.getStatus().intValue()) {
             int result = updateToConfirmationById(tcc.getId());
             if (result == 0) {
-                throw new ReservationExpireException("resource " + id + " has been cancelled");
+                throw new RuntimeException("resource " + id + " has been cancelled");
             }
+        } else if (TccStatus.CANCEL == tcc.getStatus().intValue()) {
+            throw new RuntimeException("resource " + id + " has been cancelled");
         }
-
         return 1;
+
     }
 
     private Productstocktcc selectTccById(Long id) {
@@ -113,33 +111,37 @@ public class ProductstocktccServiceImpl implements ProductstocktccService {
         return create.update(PRODUCTSTOCKTCC)
           .set(PRODUCTSTOCKTCC.STATUS, UByte.valueOf(TccStatus.CONFIRM))
           .where(PRODUCTSTOCKTCC.ID.eq(id))
-          .and(PRODUCTSTOCKTCC.STATUS.eq(UByte.valueOf(TccStatus.TRY)))
+          .and(PRODUCTSTOCKTCC.STATUS.eq(UByte.valueOf(TccStatus.TRYING))
+            .or(PRODUCTSTOCKTCC.STATUS.eq(UByte.valueOf(TccStatus.CONFIRM))))
           .execute();
     }
 
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void cancelReservation(Long id) {
+    public int cancelReservation(Long id) {
         Productstocktcc tcc = selectTccById(id);
         if (tcc == null) {
-            throw new ReservationExpireException("resource " + id + " has been cancelled or does not exist at all");
+            throw new RuntimeException("resource " + id + " has been cancelled or does not exist at all");
         }
-        if (TccStatus.TRY == tcc.getStatus().intValue()) {
-            int result = deleteTccById(tcc.getId());
-            if (result == 1) {
+        if (TccStatus.CANCEL != tcc.getStatus().intValue()) {
+            int result = deleteTccById(ULong.valueOf(id));
+            if (result == 1) {  //返回0说明有其他线程已经回退了库存，这时候直接返回1即可
                 int returnReservedStock = returnReservedStock(tcc.getTProductId());
                 if (returnReservedStock == 0) {
+                    //回退本次事务
                     throw new IllegalStateException("product stock reservation id " + tcc.getId() + " was succeeded in deleting, but failed to make compensation for product id " + tcc.getTProductId());
                 }
             }
         }
+        return 1;
     }
 
     private int deleteTccById(ULong id) {
-        return create.delete(PRODUCTSTOCKTCC)
+        return create.update(PRODUCTSTOCKTCC)
+          .set(PRODUCTSTOCKTCC.STATUS, UByte.valueOf(TccStatus.CANCEL))
           .where(PRODUCTSTOCKTCC.ID.eq(id))
-          .and(PRODUCTSTOCKTCC.STATUS.eq(UByte.valueOf(TccStatus.TRY)))
+          .and(PRODUCTSTOCKTCC.STATUS.ne(UByte.valueOf(TccStatus.CANCEL)))
           .execute();
     }
 

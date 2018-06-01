@@ -1,9 +1,7 @@
 package com.bian.order.feign;
 
-import com.bian.common.Shift;
-import com.bian.common.StatusCode;
-import com.bian.common.model.vo.Participant;
-import com.bian.common.model.vo.VoUser;
+import com.alibaba.fastjson.JSONObject;
+import com.bian.order.model.SystemException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,22 +12,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class UserClientFallback implements UserClient {
 
     @Override
-    public VoUser findUser(@PathVariable("userId") Long userId) {
+    public JSONObject findUser(@PathVariable("userId") Long userId) {
         didNotGetResponse();
-        Shift.fatal(StatusCode.SERVER_IS_BUSY_NOW);
-        return null;
+        throw new SystemException("user client findUser callback");
     }
 
     @Override
-    public Long reserve(@RequestParam("userId") Long userId, @RequestParam("amount") Long amount) {
+    public Long trying(@RequestParam("userId") Long userId, @RequestParam("amount") Long amount) {
         didNotGetResponse();
-        Shift.fatal(StatusCode.SERVER_IS_BUSY_NOW);
-        return null;
+        throw new SystemException("user client trying-balance callback");
     }
 
     @Override
     public int confirm(Long partId) {
-        return 0;
+        return 0;   //0代表未成功确认资源
     }
 
     private void didNotGetResponse() {

@@ -30,6 +30,12 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.16.18</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.39</version>
         </dependency>
     </dependencies>
 
@@ -63,13 +69,13 @@
     </build>
 
     <!--<repositories>-->
-        <!--<repository>-->
-            <!--<id>spring-milestones</id>-->
-            <!--<name>Spring Milestones</name>-->
-            <!--<url>http://repo.spring.io/milestone</url>-->
-            <!--<snapshots>-->
-                <!--<enabled>false</enabled>-->
-            <!--</snapshots>-->
-        <!--</repository>-->
+    <!--<repository>-->
+    <!--<id>spring-milestones</id>-->
+    <!--<name>Spring Milestones</name>-->
+    <!--<url>http://repo.spring.io/milestone</url>-->
+    <!--<snapshots>-->
+    <!--<enabled>false</enabled>-->
+    <!--</snapshots>-->
+    <!--</repository>-->
     <!--</repositories>-->
 </project>

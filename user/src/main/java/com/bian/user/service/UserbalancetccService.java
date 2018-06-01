@@ -11,5 +11,5 @@ public interface UserbalancetccService {
     int confirmReservation(Long id);
 
     @Transactional
-    void cancelReservation(Long id);
+    int cancelReservation(Long id);
 }

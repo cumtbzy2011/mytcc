@@ -1,12 +1,8 @@
 package com.bian.order.feign;
 
-import com.bian.common.Shift;
-import com.bian.common.StatusCode;
-import com.bian.common.model.vo.Participant;
-import com.bian.order.model.response.ObjectDataResponse;
-import com.bian.common.model.vo.VoProduct;
+import com.alibaba.fastjson.JSONObject;
+import com.bian.order.model.SystemException;
 import lombok.extern.slf4j.Slf4j;
-import org.jooq.tools.json.JSONObject;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -15,21 +11,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class ProductFallback implements ProductClient {
 
     @Override
-    public VoProduct findProduct(@PathVariable("id") Long productId) {
+    public JSONObject findProduct(@PathVariable("id") Long productId) {
         log.error("service product is unreachable");
-        Shift.fatal(StatusCode.SERVER_IS_BUSY_NOW);
-        return null;
+        throw new SystemException("product client findProduct callback");
     }
 
     @Override
-    public Long reserve(Long productId) {
+    public Long trying(Long productId) {
         log.error("service product is unreachable");
-        Shift.fatal(StatusCode.SERVER_IS_BUSY_NOW);
-        return null;
+        throw new SystemException("product client trying-stock callback");
     }
 
     @Override
-    public Integer confirm(Long partId) {
+    public int confirm(Long partId) {
         return 0;
     }
 }

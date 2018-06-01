@@ -1,8 +1,6 @@
 package com.bian.product.rest;
 
-
-import com.bian.common.model.vo.Participant;
-import com.bian.common.model.vo.VoProduct;
+import com.alibaba.fastjson.JSONObject;
 import com.bian.product.jooq.tables.pojos.Product;
 import com.bian.product.jooq.tables.pojos.Productstocktcc;
 import com.bian.product.service.ProductService;
@@ -36,10 +34,9 @@ public class ProductStockReservationController {
 
     //取消预留cancel
     @RequestMapping(value = "/stocks/reservation", method = RequestMethod.DELETE)
-    public void cancel(@PathVariable Long reservationId) {
-        productstocktccService.cancelReservation(reservationId);
+    public Integer cancel(@PathVariable Long reservationId) {
+        return productstocktccService.cancelReservation(reservationId);
     }
-
 
 
     //////////////
@@ -47,18 +44,10 @@ public class ProductStockReservationController {
     ProductService productService;
 
     @GetMapping(value = "/product/{id}")
-    public Product findById(@PathVariable("id") Long id) {
+    public JSONObject findById(@PathVariable("id") Long id) {
         Product product = productService.selectById(id);
-
-        VoProduct voProduct = new VoProduct();
-        voProduct.setCreateTime(product.getCreateTime().toLocalDateTime());
-        voProduct.setDeleteTime(product.getDeleteTime().toLocalDateTime());
-        voProduct.setId(product.getId().longValue());
-        voProduct.setName(product.getName());
-        voProduct.setPrice(product.getPrice().intValue());
-        voProduct.setStock(product.getStock().intValue());
-        voProduct.setUpdateTime(product.getUpdateTime().toLocalDateTime());
-
-        return product;
+        JSONObject result = new JSONObject();
+        result.put("price", product.getPrice().intValue());
+        return result;
     }
 }

@@ -1,15 +1,14 @@
 package com.bian.order.service;
 
-import com.bian.common.exception.BusinessException;
-import com.bian.common.model.OrderStatus;
-import com.bian.common.model.vo.VoProduct;
-import com.bian.common.model.vo.VoUser;
+import com.alibaba.fastjson.JSONObject;
 import com.bian.order.feign.ProductClient;
 import com.bian.order.feign.UserClient;
 import com.bian.order.jooq.tables.pojos.Conflict;
 import com.bian.order.jooq.tables.pojos.Order;
 import com.bian.order.jooq.tables.pojos.Participant;
 import com.bian.order.jooq.tables.records.OrderRecord;
+import com.bian.order.model.BusinessException;
+import com.bian.order.model.OrderStatus;
 import org.jooq.DSLContext;
 import org.jooq.types.UByte;
 import org.jooq.types.UInteger;
@@ -22,9 +21,9 @@ import org.springframework.util.CollectionUtils;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.bian.order.jooq.tables.Conflict.CONFLICT;
 import static com.bian.order.jooq.tables.Order.ORDER_;
 import static com.bian.order.jooq.tables.Participant.PARTICIPANT;
-import static com.bian.order.jooq.tables.Conflict.CONFLICT;
 
 @Service
 public class OrderService {
@@ -86,7 +85,8 @@ public class OrderService {
         checkNotNull(order, new BusinessException("订单不存在"));
         List<Participant> participants = selectByOrderId(order.getId());
         checkTrue(!CollectionUtils.isEmpty(participants), new BusinessException("该订单不存在可用资源"));
-        if (order.getStatus().intValue() == OrderStatus.PROCESSING || order.getStatus().intValue() == OrderStatus.CONFLICT) {
+        if (order.getStatus().intValue() == OrderStatus.TRYING
+          || order.getStatus().intValue() == OrderStatus.CONFIRM_CONFLICT) {
             confirmPhase(order, participants);
         }
         return order;
@@ -104,15 +104,15 @@ public class OrderService {
           }
         );
         if (confirmNum.intValue() == participants.size()) {
-            order.setStatus(UByte.valueOf(OrderStatus.DONE));
+            order.setStatus(UByte.valueOf(OrderStatus.CONFIRM));
             changeOrderStatus(order);
-        } else if (confirmNum.intValue() == 0) {
+        } else if (confirmNum.intValue() == 0) {        //没分离异常导致的callback=0还是真的确认返回的0
             order.setStatus(UByte.valueOf(OrderStatus.TIMEOUT));
             changeOrderStatus(order);
         } else {
             //有一部分被确认，一部分没有呗确认，那么被确认的资源将不会被回退，必须要人工去取消确认的资源
             //订单处于冲突状态，可能关联到第三方支付，所以也不做回退
-            order.setStatus(UByte.valueOf(OrderStatus.CONFLICT));
+            order.setStatus(UByte.valueOf(OrderStatus.CONFIRM_CONFLICT));
             changeOrderStatus(order);
             Conflict conflict = new Conflict();
             conflict.setErrorDetail("确认冲突");
@@ -132,17 +132,17 @@ public class OrderService {
 
     @Transactional
     public Order placeOrder(Long userId, Long productId) {
-        VoProduct product = productClient.findProduct(productId);
-        VoUser user = userClient.findUser(userId);
+        JSONObject product = productClient.findProduct(productId);
+        JSONObject user = userClient.findUser(userId);
         checkNotNull(product, new BusinessException("商品不存在"));
         checkNotNull(user, new BusinessException("用户不存在"));
-        checkTrue(user.getBalance() >= product.getPrice(), new BusinessException("余额不足"));
+        checkTrue(user.getIntValue("balance") >= product.getIntValue("price"), new BusinessException("余额不足"));
 
         final Order order = new Order();
         order.setUserId(ULong.valueOf(userId));
         order.setProductId(ULong.valueOf(productId));
-        order.setPrice(UInteger.valueOf(product.getPrice()));
-        order.setStatus(UByte.valueOf(OrderStatus.PROCESSING));
+        order.setPrice(UInteger.valueOf(product.getIntValue("price")));
+        order.setStatus(UByte.valueOf(OrderStatus.TRYING));
         this.insert(order);
 
         reserveBalance(order);
@@ -151,13 +151,13 @@ public class OrderService {
     }
 
     private void reserveProduct(Order order) {
-        Long reserveId = productClient.reserve(order.getProductId().longValue());
+        Long reserveId = productClient.trying(order.getProductId().longValue());
         checkNotNull(reserveId, new BusinessException("库存不足"));
         persistParticipant(reserveId, "product", order.getId());
     }
 
     private void reserveBalance(Order order) {
-        Long reserveId = userClient.reserve(order.getUserId().longValue(), order.getPrice().longValue());
+        Long reserveId = userClient.trying(order.getUserId().longValue(), order.getPrice().longValue());
         checkNotNull(reserveId, new BusinessException("余额不足"));
         persistParticipant(reserveId, "balance", order.getId());
     }
