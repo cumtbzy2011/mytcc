@@ -19,8 +19,7 @@ public class ParticipantServiceImpl implements ParticipantService {
 
     public int insert(Participant participant) {
         return create.insertInto(PARTICIPANT)
-          .set(PARTICIPANT.EXPIRE_TIME, Timestamp.valueOf(LocalDateTime.now()))
-          .set(PARTICIPANT.URI, "testuri")
+
           .set(PARTICIPANT.T_ORDER_ID, ULong.valueOf(1))
           .execute();
     }

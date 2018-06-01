@@ -20,11 +20,8 @@
         <module>center</module>
         <module>product</module>
         <module>order</module>
-        <module>coordinator</module>
         <module>user</module>
         <module>membership</module>
-        <module>config</module>
-        <module>common</module>
         <module>outerEureka</module>
     </modules>
 

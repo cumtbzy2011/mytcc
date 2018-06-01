@@ -86,9 +86,7 @@ public class OrderService {
         checkNotNull(order, new BusinessException("订单不存在"));
         List<Participant> participants = selectByOrderId(order.getId());
         checkTrue(!CollectionUtils.isEmpty(participants), new BusinessException("该订单不存在可用资源"));
-        //虽然资源支持重复确认-为了重试，但是订单的其他三个状态，DONE代表订单已完成，没有必要再确认，
-        // TIMEOUT、CONFLICT说明有资源已经过期了，这时候肯定不能确认所有资源，所以也没有确认的意义
-        if (order.getStatus().intValue() == OrderStatus.PROCESSING) {
+        if (order.getStatus().intValue() == OrderStatus.PROCESSING || order.getStatus().intValue() == OrderStatus.CONFLICT) {
             confirmPhase(order, participants);
         }
         return order;
@@ -113,10 +111,11 @@ public class OrderService {
             changeOrderStatus(order);
         } else {
             //有一部分被确认，一部分没有呗确认，那么被确认的资源将不会被回退，必须要人工去取消确认的资源
+            //订单处于冲突状态，可能关联到第三方支付，所以也不做回退
             order.setStatus(UByte.valueOf(OrderStatus.CONFLICT));
             changeOrderStatus(order);
             Conflict conflict = new Conflict();
-            conflict.setErrorDetail("test detail");
+            conflict.setErrorDetail("确认冲突");
             conflict.setTOrderId(order.getId());
             insertConflict(conflict);
         }
@@ -181,5 +180,38 @@ public class OrderService {
           .set(PARTICIPANT.PART_ID, partId.toString())
           .set(PARTICIPANT.PART_TYPE, type)
           .execute();
+    }
+
+    //失败可以重试
+    public Order cancel(Long orderId) {
+        Order order = this.selectById(orderId);
+        if (order == null || order.getStatus().intValue() == OrderStatus.CANCEL) {
+            return order;
+        }
+
+        List<Participant> participants = selectByOrderId(order.getId());
+        AtomicInteger cancelNum = new AtomicInteger();
+        participants.forEach(
+          participant -> {
+              if ("balance".equals(participant.getPartType())) {
+                  cancelNum.addAndGet(userClient.confirm(Long.parseLong(participant.getPartId())));
+              } else {
+                  cancelNum.addAndGet(productClient.confirm(Long.parseLong(participant.getPartId())));
+              }
+          }
+        );
+
+        if (cancelNum.intValue() == participants.size()) {
+            order.setStatus(UByte.valueOf(OrderStatus.CANCEL));
+        } else {
+            order.setStatus(UByte.valueOf(OrderStatus.CANCEL_CONFLICT));
+            Conflict conflict = new Conflict();
+            conflict.setTOrderId(order.getId());
+            conflict.setErrorDetail("取消冲突");
+            insertConflict(conflict);
+        }
+
+        changeOrderStatus(order);
+        return order;
     }
 }

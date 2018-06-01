@@ -31,11 +31,8 @@ public class ConflictServiceImplTest {
 
     @Test
     public void testClient() {
-        ObjectDataResponse<String> result = productClient.test(101L);
 
-        Assert.assertNotNull(result);
 
-        System.out.println(result.getData());
     }
 
     @Before

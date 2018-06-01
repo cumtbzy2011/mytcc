@@ -31,9 +31,15 @@ public class OrderController {
     //confirm
     @GetMapping("confirm")
     public Order payOff(@RequestParam Long orderId) {
-        return orderService.confrim(orderId);
+        return orderService.confirm(orderId);
     }
 
+    //cancel
+    @GetMapping("cancel")
+    public Boolean cancelOrder(@RequestParam Long orderId) {
+        orderService.cancel(orderId);
+        return true;
+    }
 
 
     @Data
