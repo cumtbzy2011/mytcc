@@ -23,6 +23,7 @@
         <module>user</module>
         <module>membership</module>
         <module>outerEureka</module>
+        <module>dispatcher</module>
     </modules>
 
     <dependencies>

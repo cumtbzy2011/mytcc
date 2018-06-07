@@ -8,6 +8,12 @@ spring:
     url: jdbc:mysql://106.15.226.228:3306/user?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: root
     password: 123456
+  redis:
+    host: 106.15.226.228
+    port: 6379
+    database: 1
+    pool:
+      max-active: 20
 eureka:
   client:
     registerWithEureka: true
