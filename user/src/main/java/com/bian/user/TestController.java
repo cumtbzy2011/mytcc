@@ -91,6 +91,8 @@ public class TestController {
 
     public Object setRedis() {
         BoundValueOperations<String, String> testKey = redisTemplate.boundValueOps("testKey");
+        HyperLogLogOperations<String, String> stringStringHyperLogLogOperations = redisTemplate.opsForHyperLogLog();
+
         testKey.set("test1");
         return "success";
     }
